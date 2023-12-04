@@ -15,11 +15,11 @@ namespace LibraryDb.Data
         {
             optionsBuilder.UseSqlServer(@"
                     Server=localhost; 
-                    Database=LibraryDb; 
+                    Database=NewtonLibraryLeo; 
                     Trusted_Connection=True; 
                     Trust Server Certificate=Yes; 
-                    User Id=LibraryDb; 
-                    password=LibraryDb");
+                    User Id=NewtonLibrary; 
+                    password=NewtonLibrary");
         }
     }
 }
