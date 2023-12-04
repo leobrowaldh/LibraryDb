@@ -37,5 +37,16 @@ namespace LibraryDb.Data
                 }
             }
         }
+
+        public void SeedCustomers()
+        {
+            //10 customers will be created
+            csSeedGenerator seeder = new csSeedGenerator();
+            for (int i = 0;i < 10; i++)
+            {
+                Customer customer = new Customer();
+                customer.Seed(seeder);
+            }
+        }
     }
 }
