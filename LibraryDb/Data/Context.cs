@@ -10,6 +10,7 @@ namespace LibraryDb.Data
         public DbSet<Card> Cards { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<ISBN> ISBNs { get; set; }
+        public DbSet<OrderHistory> OrderHistories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
