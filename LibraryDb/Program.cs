@@ -1,10 +1,13 @@
-﻿namespace LibraryDb
+﻿using LibraryDb.Data;
+
+namespace LibraryDb
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            DataAccess dataAccess = new DataAccess();
+
         }
     }
 }
