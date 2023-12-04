@@ -7,7 +7,8 @@ namespace LibraryDb
         static void Main(string[] args)
         {
             DataAccess dataAccess = new DataAccess();
-
+            dataAccess.SeedLibrary();
+            dataAccess.SeedCustomers();
         }
     }
 }

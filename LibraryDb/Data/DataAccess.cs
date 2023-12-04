@@ -30,6 +30,8 @@ namespace LibraryDb.Data
                         author2.Seed(seeder);
                         isbn.Authors.Add(author1);
                         isbn.Authors.Add(author2);
+                        Book book = new Book();
+                        isbn.Books.Add(book);
                         context.ISBNs.Add(isbn);
                     }
                     else
@@ -37,6 +39,8 @@ namespace LibraryDb.Data
                         Author author = new Author();
                         author.Seed(seeder);
                         isbn.Authors.Add(author);
+                        Book book = new Book();
+                        isbn.Books.Add(book);
                         context.ISBNs.Add(isbn);
                     }
                 }
