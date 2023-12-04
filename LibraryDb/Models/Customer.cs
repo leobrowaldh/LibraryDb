@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Helpers;
 
 namespace LibraryDb.Models
 {
@@ -14,5 +10,14 @@ namespace LibraryDb.Models
         public int CardId { get; set; }
         public Card? Card { get; set; }
         public ICollection<Book>? Books { get; set; } = new List<Book>();
+
+        public void Seed(csSeedGenerator seed)
+        {
+            FirstName = seed.FirstName;
+            LastName = seed.LastName;
+            Card card = new Card();
+            card.Seed(seed);
+            Card = card;
+        }
     }
 }

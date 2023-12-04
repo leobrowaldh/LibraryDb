@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Helpers;
 
 namespace LibraryDb.Models
 {
@@ -11,5 +7,10 @@ namespace LibraryDb.Models
         public int Id { get; set; }
         public int PIN { get; set; }
         public Customer Customer { get; set; }
+
+        public void Seed(csSeedGenerator seed)
+        {
+            PIN = seed.Next(0001, 9999);
+        }
     }
 }

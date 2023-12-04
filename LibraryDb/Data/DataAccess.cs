@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using LibraryDb.Models;
+﻿using Helpers;
 
 namespace LibraryDb.Data
 {
-    internal class DataAccess 
+    internal class DataAccess
     {
+        public void SeedLibrary()
+        {
+            csSeedGenerator seeder = new csSeedGenerator();
+
+        }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Helpers;
 
 namespace LibraryDb.Models
 {
@@ -10,7 +6,8 @@ namespace LibraryDb.Models
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
-        public ICollection<Customer> Customers { get; set; }
-        public ICollection<ISBN> ISBNs { get; set; }
+        public ICollection<Customer> Customers { get; set; } = new List<Customer>();
+        public ICollection<ISBN> ISBNs { get; set; } = new List<ISBN>();
+
     }
 }
