@@ -15,12 +15,7 @@ namespace LibraryDb.Data
                 {
                     ISBN isbn = new ISBN();
                     isbn.Seed(seeder);
-                    int copies = seeder.Next(2, 10);
-                    for (int j = 0; j < copies; j++)
-                    {
-                        Book book = new Book();
-                        book.ISBN = isbn;
-                    }
+                    
                     //only one isbn will have 2 authors, since this is not very common.
                     if (i == 0)
                     {
@@ -30,8 +25,12 @@ namespace LibraryDb.Data
                         author2.Seed(seeder);
                         isbn.Authors.Add(author1);
                         isbn.Authors.Add(author2);
-                        Book book = new Book();
-                        isbn.Books.Add(book);
+                        int copies = seeder.Next(2, 10);
+                        for (int j = 0; j < copies; j++)
+                        {
+                            Book book = new Book();
+                            isbn.Books.Add(book);
+                        }
                         context.ISBNs.Add(isbn);
                     }
                     else
@@ -39,8 +38,12 @@ namespace LibraryDb.Data
                         Author author = new Author();
                         author.Seed(seeder);
                         isbn.Authors.Add(author);
-                        Book book = new Book();
-                        isbn.Books.Add(book);
+                        int copies = seeder.Next(2, 10);
+                        for (int j = 0; j < copies; j++)
+                        {
+                            Book book = new Book();
+                            isbn.Books.Add(book);
+                        }
                         context.ISBNs.Add(isbn);
                     }
                 }
