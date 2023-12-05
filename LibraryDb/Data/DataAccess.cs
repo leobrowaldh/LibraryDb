@@ -212,5 +212,53 @@ namespace LibraryDb.Data
 
         #endregion
 
+        #region Removing things from database
+
+        /// <summary>
+        /// Deletes the Customer with the provided CustomerId and return true if deleted, 
+        /// return false if the customerId is not found in the database.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns>bool</returns>
+        public bool DeleteCustomer(int customerId)
+        {
+            using (Context context = new Context())
+            {
+                Customer? customerToBeDeleted = context.Customers.Find(customerId);
+                if(customerToBeDeleted != null)
+                {
+                    context.Customers.Remove(customerToBeDeleted);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Deletes the Book with the provided bookId and return true if deleted, 
+        /// return false if the bookId is not found in the database.
+        /// </summary>
+        /// <param name="bookId"></param>
+        /// <returns>bool</returns>
+        public bool DeleteBook(int bookId)
+        {
+            using (Context context = new Context())
+            {
+                Book? bookToBeDeleted = context.Books.Find(bookId);
+                if (bookToBeDeleted != null)
+                {
+                    context.Books.Remove(bookToBeDeleted);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
+        #endregion
+
     }
 }
