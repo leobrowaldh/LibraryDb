@@ -186,14 +186,25 @@ namespace LibraryDb.Data
 
         #endregion
 
-        #region renting and returning
-        public void RentBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)
+        #region Borrowing and returning
+        public void BorrowBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)
         {
             book.Borrowed = true;
             book.BorrowedDate = borrowDate;
             book.ReturnDate = returnDate;
             book.Customer = customer;
             using(Context context = new Context())
+            {
+                context.SaveChanges();
+            }
+        }
+
+        public void ReturnBook(Book book)
+        {
+            book.Borrowed = false;
+            book.BorrowedDate= null;
+            book.ReturnDate= null;
+            using (Context context = new Context())
             {
                 context.SaveChanges();
             }
