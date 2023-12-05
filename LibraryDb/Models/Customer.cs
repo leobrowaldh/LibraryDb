@@ -11,6 +11,18 @@ namespace LibraryDb.Models
         public Card? Card { get; set; }
         public ICollection<Book>? Books { get; set; } = new List<Book>();
 
+
+        public Customer() { }
+        public Customer(string firstName, string lastName)
+        {
+            csSeedGenerator seed = new csSeedGenerator();
+            FirstName = firstName;
+            LastName = lastName;
+            Card card = new Card();
+            card.Seed(seed);
+            Card = card;
+        }
+
         public void Seed(csSeedGenerator seed)
         {
             FirstName = seed.FirstName;

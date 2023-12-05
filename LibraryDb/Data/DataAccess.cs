@@ -100,24 +100,85 @@ namespace LibraryDb.Data
             return false;
         }
 
-        public void CreateBook(string title, int year, int rating, int copies, List<TheAuthor> authors)
+        /// <summary>
+        /// Creates an instance of an isbn, this does not create copies of the book in the library it sets the book information (isbn)
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="year"></param>
+        /// <param name="rating"></param>
+        /// <param name="copies"></param>
+        /// <param name="authors"></param>
+        public void CreateNewIsbn(string title, int year, int rating, List<TheAuthor> authors)
+        {
+            csSeedGenerator seeder = new csSeedGenerator();
+            ISBN isbn = new ISBN()
+            {
+                Isbn = ISBN.RandomizeIsbn(seeder),
+                Title = title,
+                Year = year,
+                Rating = rating,
+                Authors = authors
+            };
+
+            using (Context context = new Context())
+            {
+                context.ISBNs.Add(isbn);
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Creates a number of actual instances of the book(isbn) in the library.
+        /// </summary>
+        public void CreateCopyOfExistingIsbn(int copiesToAdd, ISBN isbn)
+        {   
+            for (int i = 0; i < copiesToAdd; i++)
+            {
+                Book book = new Book();
+                book.ISBN = isbn;
+            }
+
+            using (Context context = new Context())
+            {
+                context.SaveChanges();
+            }
+        }
+
+
+        /// <summary>
+        /// returns true if the isbn allready exists in the database, and outputs this existing isbn.
+        /// </summary>
+        /// <param name="iSBN"></param>
+        /// <param name="existingIsbn"></param>
+        /// <returns></returns>
+        public bool CheckIfIsbnInDatabase(ISBN iSBN, out ISBN existingIsbn)
         {
             using (Context context = new Context())
             {
-                csSeedGenerator seeder = new csSeedGenerator();
-                ISBN isbn = new ISBN()
+                var existingIsbns = context.ISBNs.ToList();
+
+                for (int i = 0; i < existingIsbns.Count; i++)
                 {
-                    Isbn = ISBN.RandomizeIsbn(seeder),
-                    Title = title,
-                    Year = year,
-                    Rating = rating
-                };
+                    if (existingIsbns[i].Isbn == iSBN.Isbn)
+                    {
+                        existingIsbn = existingIsbns[i];
+                        return true;
+                    }
+                }
             }
+            existingIsbn = null;
+            return false;
         }
 
         public void CreateNewCustomer(string firstName, string lastName)
         {
+            Customer customer = new Customer(firstName, lastName);
 
+            using (Context context = new Context())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
         }
 
         
