@@ -14,10 +14,10 @@ namespace LibraryDb.Data
             {
                 ISBN isbn = new ISBN();
                 isbn.Seed(seeder); 
-                Author author = new Author();
+                TheAuthor author = new TheAuthor();
                 author.Seed(seeder);
                 //if the author already exists, we add the isbn to the existing author.
-                if (CheckIfAuthorExists(author, out  Author existingAuthor))
+                if (CheckIfAuthorExists(author, out  TheAuthor existingAuthor))
                 {
                     author = existingAuthor;
                 }
@@ -65,10 +65,10 @@ namespace LibraryDb.Data
         {
             using (Context context = new Context())
             {
-                Author author = new Author(){ AuthorName = authorName };
+                TheAuthor author = new TheAuthor(){ AuthorName = authorName };
                 if (!CheckIfAuthorExists(author, out _))
                 {
-                    context.Authors.Add(author);
+                    context.TheAuthors.Add(author);
                     context.SaveChanges();
                     return true;
                 }
@@ -82,11 +82,11 @@ namespace LibraryDb.Data
         /// <param name="author"></param>
         /// <param name="existingAuthor"></param>
         /// <returns></returns>
-        public bool CheckIfAuthorExists(Author author, out Author existingAuthor)
+        public bool CheckIfAuthorExists(TheAuthor author, out TheAuthor existingAuthor)
         {
             using (Context context = new Context())
             {
-                var existingAuthors = context.Authors.ToList();
+                var existingAuthors = context.TheAuthors.ToList();
                 for (int i = 0;i < existingAuthors.Count; i++)
                 {
                     if (existingAuthors[i].AuthorName.ToLower() == author.AuthorName.ToLower())
@@ -100,7 +100,7 @@ namespace LibraryDb.Data
             return false;
         }
 
-        public void CreateBook(string title, int year, int rating, int copies, List<Author> authors)
+        public void CreateBook(string title, int year, int rating, int copies, List<TheAuthor> authors)
         {
             using (Context context = new Context())
             {

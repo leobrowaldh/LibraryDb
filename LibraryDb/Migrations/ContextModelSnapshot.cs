@@ -22,7 +22,7 @@ namespace LibraryDb.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AuthorISBN", b =>
+            modelBuilder.Entity("ISBNTheAuthor", b =>
                 {
                     b.Property<int>("AuthorsId")
                         .HasColumnType("int");
@@ -34,24 +34,7 @@ namespace LibraryDb.Migrations
 
                     b.HasIndex("ISBNsId");
 
-                    b.ToTable("AuthorISBN");
-                });
-
-            modelBuilder.Entity("LibraryDb.Models.Author", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AuthorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Authors");
+                    b.ToTable("ISBNTheAuthor");
                 });
 
             modelBuilder.Entity("LibraryDb.Models.Book", b =>
@@ -182,9 +165,26 @@ namespace LibraryDb.Migrations
                     b.ToTable("OrderHistories");
                 });
 
-            modelBuilder.Entity("AuthorISBN", b =>
+            modelBuilder.Entity("LibraryDb.Models.TheAuthor", b =>
                 {
-                    b.HasOne("LibraryDb.Models.Author", null)
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TheAuthors");
+                });
+
+            modelBuilder.Entity("ISBNTheAuthor", b =>
+                {
+                    b.HasOne("LibraryDb.Models.TheAuthor", null)
                         .WithMany()
                         .HasForeignKey("AuthorsId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -6,24 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LibraryDb.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialAzure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Authors",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AuthorName = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Authors", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Cards",
                 columns: table => new
@@ -38,19 +25,29 @@ namespace LibraryDb.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ISBNs",
+                name: "OrderHistories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Isbn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Rating = table.Column<double>(type: "float", nullable: false)
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ISBNs", x => x.Id);
+                    table.PrimaryKey("PK_OrderHistories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TheAuthors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AuthorName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TheAuthors", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,7 +58,8 @@ namespace LibraryDb.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CardId = table.Column<int>(type: "int", nullable: false)
+                    CardId = table.Column<int>(type: "int", nullable: false),
+                    OrderHistoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,30 +70,33 @@ namespace LibraryDb.Migrations
                         principalTable: "Cards",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Customers_OrderHistories_OrderHistoryId",
+                        column: x => x.OrderHistoryId,
+                        principalTable: "OrderHistories",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorISBN",
+                name: "ISBNs",
                 columns: table => new
                 {
-                    AuthorsId = table.Column<int>(type: "int", nullable: false),
-                    ISBNsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Isbn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<double>(type: "float", nullable: false),
+                    OrderHistoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorISBN", x => new { x.AuthorsId, x.ISBNsId });
+                    table.PrimaryKey("PK_ISBNs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthorISBN_Authors_AuthorsId",
-                        column: x => x.AuthorsId,
-                        principalTable: "Authors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AuthorISBN_ISBNs_ISBNsId",
-                        column: x => x.ISBNsId,
-                        principalTable: "ISBNs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_ISBNs_OrderHistories_OrderHistoryId",
+                        column: x => x.OrderHistoryId,
+                        principalTable: "OrderHistories",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -126,10 +127,29 @@ namespace LibraryDb.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_AuthorISBN_ISBNsId",
-                table: "AuthorISBN",
-                column: "ISBNsId");
+            migrationBuilder.CreateTable(
+                name: "ISBNTheAuthor",
+                columns: table => new
+                {
+                    AuthorsId = table.Column<int>(type: "int", nullable: false),
+                    ISBNsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ISBNTheAuthor", x => new { x.AuthorsId, x.ISBNsId });
+                    table.ForeignKey(
+                        name: "FK_ISBNTheAuthor_ISBNs_ISBNsId",
+                        column: x => x.ISBNsId,
+                        principalTable: "ISBNs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ISBNTheAuthor_TheAuthors_AuthorsId",
+                        column: x => x.AuthorsId,
+                        principalTable: "TheAuthors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_CustomerId",
@@ -146,19 +166,31 @@ namespace LibraryDb.Migrations
                 table: "Customers",
                 column: "CardId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_OrderHistoryId",
+                table: "Customers",
+                column: "OrderHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ISBNs_OrderHistoryId",
+                table: "ISBNs",
+                column: "OrderHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ISBNTheAuthor_ISBNsId",
+                table: "ISBNTheAuthor",
+                column: "ISBNsId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorISBN");
-
-            migrationBuilder.DropTable(
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Authors");
+                name: "ISBNTheAuthor");
 
             migrationBuilder.DropTable(
                 name: "Customers");
@@ -167,7 +199,13 @@ namespace LibraryDb.Migrations
                 name: "ISBNs");
 
             migrationBuilder.DropTable(
+                name: "TheAuthors");
+
+            migrationBuilder.DropTable(
                 name: "Cards");
+
+            migrationBuilder.DropTable(
+                name: "OrderHistories");
         }
     }
 }

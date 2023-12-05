@@ -2,7 +2,7 @@
 
 namespace LibraryDb.Models
 {
-    internal class Author
+    internal class TheAuthor
     {
         public int Id { get; set; }
         public string AuthorName { get; set; }

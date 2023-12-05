@@ -11,7 +11,7 @@ namespace LibraryDb.Models
         public int Year { get; set; }
         public double Rating { get; set; }
         public ICollection<Book> Books { get; set; } = new List<Book>();
-        public ICollection<Author> Authors { get; set; } = new List<Author>();
+        public ICollection<TheAuthor> Authors { get; set; } = new List<TheAuthor>();
 
         public void Seed(csSeedGenerator seed)
         {
