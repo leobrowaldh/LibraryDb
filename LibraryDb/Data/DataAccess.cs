@@ -55,7 +55,7 @@ namespace LibraryDb.Data
         }
         #endregion
 
-
+        #region Creating things in database
         /// <summary>
         /// Creates a desired Author and reurns true if successfull, false if it allready exists.
         /// </summary>
@@ -74,30 +74,6 @@ namespace LibraryDb.Data
                 }
                 return false;
             }
-        }
-
-        /// <summary>
-        /// returns true if the author allready exists in the database, and outputs this existing Author.
-        /// </summary>
-        /// <param name="author"></param>
-        /// <param name="existingAuthor"></param>
-        /// <returns></returns>
-        public bool CheckIfAuthorExists(TheAuthor author, out TheAuthor existingAuthor)
-        {
-            using (Context context = new Context())
-            {
-                var existingAuthors = context.TheAuthors.ToList();
-                for (int i = 0;i < existingAuthors.Count; i++)
-                {
-                    if (existingAuthors[i].AuthorName.ToLower() == author.AuthorName.ToLower())
-                    {
-                        existingAuthor = existingAuthors[i];
-                        return true;
-                    }
-                }
-            }
-            existingAuthor = null;
-            return false;
         }
 
         /// <summary>
@@ -131,7 +107,7 @@ namespace LibraryDb.Data
         /// Creates a number of actual instances of the book(isbn) in the library.
         /// </summary>
         public void CreateCopyOfExistingIsbn(int copiesToAdd, ISBN isbn)
-        {   
+        {
             for (int i = 0; i < copiesToAdd; i++)
             {
                 Book book = new Book();
@@ -142,6 +118,44 @@ namespace LibraryDb.Data
             {
                 context.SaveChanges();
             }
+        }
+
+        public void CreateNewCustomer(string firstName, string lastName)
+        {
+            Customer customer = new Customer(firstName, lastName);
+
+            using (Context context = new Context())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+        }
+
+        #endregion
+
+        #region Checking things in database
+        /// <summary>
+        /// returns true if the author allready exists in the database, and outputs this existing Author.
+        /// </summary>
+        /// <param name="author"></param>
+        /// <param name="existingAuthor"></param>
+        /// <returns></returns>
+        public bool CheckIfAuthorExists(TheAuthor author, out TheAuthor existingAuthor)
+        {
+            using (Context context = new Context())
+            {
+                var existingAuthors = context.TheAuthors.ToList();
+                for (int i = 0;i < existingAuthors.Count; i++)
+                {
+                    if (existingAuthors[i].AuthorName.ToLower() == author.AuthorName.ToLower())
+                    {
+                        existingAuthor = existingAuthors[i];
+                        return true;
+                    }
+                }
+            }
+            existingAuthor = null;
+            return false;
         }
 
 
@@ -170,17 +184,22 @@ namespace LibraryDb.Data
             return false;
         }
 
-        public void CreateNewCustomer(string firstName, string lastName)
-        {
-            Customer customer = new Customer(firstName, lastName);
+        #endregion
 
-            using (Context context = new Context())
+        #region renting and returning
+        public void RentBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)
+        {
+            book.Borrowed = true;
+            book.BorrowedDate = borrowDate;
+            book.ReturnDate = returnDate;
+            book.Customer = customer;
+            using(Context context = new Context())
             {
-                context.Customers.Add(customer);
                 context.SaveChanges();
             }
         }
 
-        
+        #endregion
+
     }
 }
