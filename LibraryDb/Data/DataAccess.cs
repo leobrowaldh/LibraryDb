@@ -19,14 +19,15 @@ namespace LibraryDb.Data
                 {
                     context.SaveChanges();
                 }
-
                 int copies = seeder.Next(minNumberOFCopies, maxNumberOfCopies);
                 for (int j = 0; j < copies; j++)
                 {
-                    CreateCopyOfExistingIsbn(copies, newIsbn);
+                    int bookId = CreateCopyOfExistingIsbn(isbnId, out Book? newCopy);
+                    if (bookId == -1)
+                    {
+                        throw new Exception("isbn not found in database");
+                    }
                 }
-                
-                        
             }
         }
 
