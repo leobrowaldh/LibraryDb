@@ -56,51 +56,52 @@ namespace LibraryDb.Data
         #endregion
 
         #region Creating things in database
-        /// <summary>
-        /// Creates a desired Author and reurns true if successfull, false if it allready exists.
-        /// </summary>
-        /// <param name="authorName"></param>
-        /// <returns></returns>
-        public bool CreateAuthor(string authorName)
+       
+        public void CreateAuthor(string authorName)
         {
             using (Context context = new Context())
             {
-                TheAuthor author = new TheAuthor(){ AuthorName = authorName };
-                if (!CheckIfAuthorExists(author, out _))
-                {
-                    context.TheAuthors.Add(author);
-                    context.SaveChanges();
-                    return true;
-                }
-                return false;
+                TheAuthor theAuthor = new TheAuthor() { AuthorName = authorName};
+                context.TheAuthors.Add(theAuthor);
             }
         }
 
         /// <summary>
         /// Creates an instance of an isbn, this does not create copies of the book in the library it sets the book information (isbn)
+        /// A random unique string is generated as isbn property.
         /// </summary>
         /// <param name="title"></param>
         /// <param name="year"></param>
         /// <param name="rating"></param>
-        /// <param name="copies"></param>
         /// <param name="authors"></param>
         public void CreateNewIsbn(string title, int year, int rating, List<TheAuthor> authors)
         {
-            csSeedGenerator seeder = new csSeedGenerator();
-            ISBN isbn = new ISBN()
-            {
-                Isbn = ISBN.RandomizeIsbn(seeder),
-                Title = title,
-                Year = year,
-                Rating = rating,
-                Authors = authors
-            };
-
             using (Context context = new Context())
             {
+                csSeedGenerator seeder = new csSeedGenerator();
+                ISBN isbn = new ISBN()
+                {
+                    Title = title,
+                    Year = year,
+                    Rating = rating,
+                    Authors = authors
+                };
+                //Generating a unique random Isbn:
+                ISBN? existingIsbn = null;
+                string randomIsbn;
+                do
+                {
+                    randomIsbn = ISBN.RandomizeIsbn(seeder);
+                    existingIsbn = context.ISBNs.FirstOrDefault(x => x.Isbn == randomIsbn);
+                }
+                while (existingIsbn != null);
+                isbn.Isbn = randomIsbn;
                 context.ISBNs.Add(isbn);
                 context.SaveChanges();
             }
+            
+
+            
         }
 
         /// <summary>
@@ -133,58 +134,6 @@ namespace LibraryDb.Data
 
         #endregion
 
-        #region Checking things in database
-        /// <summary>
-        /// returns true if the author allready exists in the database, and outputs this existing Author.
-        /// </summary>
-        /// <param name="author"></param>
-        /// <param name="existingAuthor"></param>
-        /// <returns></returns>
-        public bool CheckIfAuthorExists(TheAuthor author, out TheAuthor existingAuthor)
-        {
-            using (Context context = new Context())
-            {
-                var existingAuthors = context.TheAuthors.ToList();
-                for (int i = 0;i < existingAuthors.Count; i++)
-                {
-                    if (existingAuthors[i].AuthorName.ToLower() == author.AuthorName.ToLower())
-                    {
-                        existingAuthor = existingAuthors[i];
-                        return true;
-                    }
-                }
-            }
-            existingAuthor = null;
-            return false;
-        }
-
-
-        /// <summary>
-        /// returns true if the isbn allready exists in the database, and outputs this existing isbn.
-        /// </summary>
-        /// <param name="iSBN"></param>
-        /// <param name="existingIsbn"></param>
-        /// <returns></returns>
-        public bool CheckIfIsbnInDatabase(ISBN iSBN, out ISBN existingIsbn)
-        {
-            using (Context context = new Context())
-            {
-                var existingIsbns = context.ISBNs.ToList();
-
-                for (int i = 0; i < existingIsbns.Count; i++)
-                {
-                    if (existingIsbns[i].Isbn == iSBN.Isbn)
-                    {
-                        existingIsbn = existingIsbns[i];
-                        return true;
-                    }
-                }
-            }
-            existingIsbn = null;
-            return false;
-        }
-
-        #endregion
 
         #region Borrowing and returning
         public void BorrowBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)

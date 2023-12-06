@@ -11,7 +11,6 @@ namespace LibraryDb.Models
         public DateTime? ReturnDate { get; set; } = null;
         public ISBN ISBN { get; set; }
         public Customer? Customer { get; set; } = null;
-
-        
+        public ICollection<OrderHistory>? OrderHistory { get; set; } = new List<OrderHistory>();
     }
 }

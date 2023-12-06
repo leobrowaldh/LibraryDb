@@ -10,6 +10,7 @@ namespace LibraryDb.Models
         public int CardId { get; set; }
         public Card? Card { get; set; }
         public ICollection<Book>? Books { get; set; } = new List<Book>();
+        public ICollection<OrderHistory>? OrderHistory { get; set; } = new List<OrderHistory>();
 
 
         public Customer() { }

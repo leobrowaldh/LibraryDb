@@ -6,9 +6,12 @@ namespace LibraryDb
     {
         static void Main(string[] args)
         {
+            #region Inicial seeding
             DataAccess dataAccess = new DataAccess();
             dataAccess.SeedLibrary();
             dataAccess.SeedCustomers();
+            #endregion
+
         }
     }
 }

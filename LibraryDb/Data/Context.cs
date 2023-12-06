@@ -12,23 +12,24 @@ namespace LibraryDb.Data
         public DbSet<ISBN> ISBNs { get; set; }
         public DbSet<OrderHistory> OrderHistories { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(@"
-        //            Server=localhost; 
-        //            Database=NewtonLibraryLeo; 
-        //            Trusted_Connection=True; 
-        //            Trust Server Certificate=Yes; 
-        //            User Id=NewtonLibrary; 
-        //            password=NewtonLibrary");
-        //}
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"
-                    Server=tcp:final-project-db-leo.database.windows.net,1433;Initial Catalog=NewtonLibraryLeo;
-                    Persist Security Info=False;User ID=NewtonLibrary;Password=TheBestLibrary23;MultipleActiveResultSets=False;
-                    Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+                    Server=localhost; 
+                    Database=NewtonLibraryLeo; 
+                    Trusted_Connection=True; 
+                    Trust Server Certificate=Yes; 
+                    User Id=NewtonLibrary; 
+                    password=NewtonLibrary");
         }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(@"
+        //            Server=tcp:final-project-db-leo.database.windows.net,1433;Initial Catalog=NewtonLibraryLeo;
+        //            Persist Security Info=False;User ID=NewtonLibrary;Password=TheBestLibrary23;MultipleActiveResultSets=False;
+        //            Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        //}
+
     }
 }

@@ -7,7 +7,7 @@ namespace LibraryDb.Models
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public ICollection<Customer> Customers { get; set; } = new List<Customer>();
-        public ICollection<ISBN> ISBNs { get; set; } = new List<ISBN>();
+        public ICollection<Book> Books { get; set; } = new List<Book>();
 
     }
 }
