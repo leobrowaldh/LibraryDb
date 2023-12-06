@@ -6,28 +6,20 @@ namespace LibraryDb.Data
     internal class DataAccess
     {
         #region Database Seeding
-        public void SeedLibrary()
+        public void SeedLibrary(int numberOfIsbn, int minNumberOFCopies, int maxNumberOfCopies)
         {
             csSeedGenerator seeder = new csSeedGenerator();
-            //20 isbn will be created, there will be 2-10 copies of each in the library.
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < numberOfIsbn; i++)
             {
-                ISBN isbn = new ISBN();
-                isbn.Seed(seeder); 
-                TheAuthor author = new TheAuthor();
-                author.Seed(seeder);
-                //if the author already exists, we add the isbn to the existing author.
-                if (CheckIfAuthorExists(author, out  TheAuthor existingAuthor))
-                {
-                    author = existingAuthor;
-                }
-                isbn.Authors.Add(author);
+                CreateNewIsbn(seeder, out ISBN isbn);
+                TheAuthor theAuthor = new TheAuthor();
+                theAuthor.Seed(seeder);
+                isbn.Authors.Add(theAuthor);
 
-                int copies = seeder.Next(2, 10);
+                int copies = seeder.Next(minNumberOFCopies, maxNumberOfCopies);
                 for (int j = 0; j < copies; j++)
                 {
-                    Book book = new Book();
-                    isbn.Books.Add(book);
+                    CreateCopyOfExistingIsbn(copies, isbn);
                 }
                 using (Context context = new Context())
                 {
@@ -73,12 +65,12 @@ namespace LibraryDb.Data
         /// <param name="year"></param>
         /// <param name="rating"></param>
         /// <param name="authors"></param>
-        public void CreateNewIsbn(string title, int year, int rating, List<TheAuthor> authors)
+        public void CreateNewIsbn(string title, int year, int rating, List<TheAuthor> authors, out ISBN isbn)
         {
             using (Context context = new Context())
             {
                 csSeedGenerator seeder = new csSeedGenerator();
-                ISBN isbn = new ISBN()
+                isbn = new ISBN()
                 {
                     Title = title,
                     Year = year,
@@ -98,9 +90,27 @@ namespace LibraryDb.Data
                 context.ISBNs.Add(isbn);
                 context.SaveChanges();
             }
-            
+        }
 
-            
+        public void CreateNewIsbn(csSeedGenerator seeder, out ISBN isbn)
+        {
+            using (Context context = new Context())
+            {
+                isbn = new ISBN();
+                isbn.Seed(seeder);
+                //Generating a unique random Isbn:
+                ISBN? existingIsbn = null;
+                string randomIsbn;
+                do
+                {
+                    randomIsbn = ISBN.RandomizeIsbn(seeder);
+                    existingIsbn = context.ISBNs.FirstOrDefault(x => x.Isbn == randomIsbn);
+                }
+                while (existingIsbn != null);
+                isbn.Isbn = randomIsbn;
+                context.ISBNs.Add(isbn);
+                context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -132,7 +142,6 @@ namespace LibraryDb.Data
         }
 
         #endregion
-
 
         #region Borrowing and returning
         public void BorrowBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)

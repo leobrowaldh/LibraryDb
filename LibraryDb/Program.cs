@@ -8,8 +8,8 @@ namespace LibraryDb
         {
             #region Inicial seeding
             DataAccess dataAccess = new DataAccess();
-            dataAccess.SeedLibrary();
-            dataAccess.SeedCustomers();
+            dataAccess.SeedLibrary(20, 2, 10);
+            dataAccess.SeedCustomers(10);
             #endregion
 
         }
