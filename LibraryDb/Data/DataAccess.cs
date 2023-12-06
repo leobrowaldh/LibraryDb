@@ -54,6 +54,7 @@ namespace LibraryDb.Data
             {
                 TheAuthor theAuthor = new TheAuthor() { AuthorName = authorName};
                 context.TheAuthors.Add(theAuthor);
+                context.SaveChanges();
             }
         }
 
