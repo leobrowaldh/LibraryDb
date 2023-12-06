@@ -1,4 +1,5 @@
-﻿using Helpers;
+﻿using EntityFrameworkCore.EncryptColumn.Attribute;
+using Helpers;
 using System.Text;
 
 namespace LibraryDb.Models
@@ -6,6 +7,7 @@ namespace LibraryDb.Models
     internal class Card
     {
         public int Id { get; set; }
+        [EncryptColumn]
         public string PIN { get; set; }
         public Customer Customer { get; set; }
 

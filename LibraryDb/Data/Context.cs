@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using LibraryDb.Models;
+using EntityFrameworkCore.EncryptColumn.Interfaces;
+using EntityFrameworkCore.EncryptColumn.Util;
+using EntityFrameworkCore.EncryptColumn.Extension;
 
 namespace LibraryDb.Data
 {
@@ -31,5 +34,16 @@ namespace LibraryDb.Data
         //            Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
         //}
 
+        //To encrypt any column that use the attribute [encryptColumn]
+        private readonly IEncryptionProvider _provider;
+        public Context()
+        {
+            this._provider = new GenerateEncryptionProvider("eksa9o2f8sdv3qx374rlsiv1d0gd73du");
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.UseEncryption(this._provider);
+        }
     }
 }
