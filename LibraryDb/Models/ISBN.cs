@@ -1,4 +1,5 @@
 ﻿using Helpers;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace LibraryDb.Models
@@ -9,6 +10,7 @@ namespace LibraryDb.Models
         public string Isbn {  get; set; }
         public string Title { get; set; }
         public int Year { get; set; }
+        [Range(1,5)]
         public double Rating { get; set; }
         public ICollection<Book> Books { get; set; } = new List<Book>();
         public ICollection<TheAuthor> Authors { get; set; } = new List<TheAuthor>();
@@ -18,7 +20,7 @@ namespace LibraryDb.Models
             Isbn = RandomizeIsbn(seed);
             Title = seed.MusicAlbum;
             Year = seed.Next(1900, 2023);
-            Rating = seed.Next(1, 5);
+            Rating = seed.Next(1, 6);
         }
 
         public static string RandomizeIsbn(csSeedGenerator seed)

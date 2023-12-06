@@ -11,21 +11,21 @@ namespace LibraryDb.Data
             csSeedGenerator seeder = new csSeedGenerator();
             for (int i = 0; i < numberOfIsbn; i++)
             {
-                CreateNewIsbn(seeder, out ISBN isbn);
+                int isbnId = CreateNewIsbn(seeder, out ISBN newIsbn);
                 TheAuthor theAuthor = new TheAuthor();
                 theAuthor.Seed(seeder);
-                isbn.Authors.Add(theAuthor);
+                newIsbn.Authors.Add(theAuthor);
+                using (Context context = new Context())
+                {
+                    context.SaveChanges();
+                }
 
                 int copies = seeder.Next(minNumberOFCopies, maxNumberOfCopies);
                 for (int j = 0; j < copies; j++)
                 {
-                    CreateCopyOfExistingIsbn(copies, isbn);
+                    CreateCopyOfExistingIsbn(copies, newIsbn);
                 }
-                using (Context context = new Context())
-                {
-                    context.ISBNs.Add(isbn);
-                    context.SaveChanges();
-                }
+                
                         
             }
         }
@@ -48,30 +48,44 @@ namespace LibraryDb.Data
 
         #region Creating things in database
        
-        public void CreateAuthor(string authorName)
+        /// <summary>
+        /// Creates a new author and return its id, outputs its instance
+        /// </summary>
+        /// <param name="authorName"></param>
+        /// <returns></returns>
+        public int CreateAuthor(string authorName , out TheAuthor newlyCreatedAuthor)
         {
             using (Context context = new Context())
             {
-                TheAuthor theAuthor = new TheAuthor() { AuthorName = authorName};
-                context.TheAuthors.Add(theAuthor);
+                newlyCreatedAuthor = new TheAuthor() { AuthorName = authorName};
+                context.TheAuthors.Add(newlyCreatedAuthor);
                 context.SaveChanges();
+                int authorId = newlyCreatedAuthor.Id;
+                return authorId;
             }
         }
 
         /// <summary>
-        /// Creates an instance of an isbn, this does not create copies of the book in the library it sets the book information (isbn)
-        /// A random unique string is generated as isbn property.
+        /// Creates an instance of an isbn, this does not create copies of the book in the library, it sets the book information (isbn)
+        /// A random unique string is generated as isbn property. author IDs of existing authors has to be provided in a list.
+        /// The new IsbnId is returned, and its instance as an out.
         /// </summary>
         /// <param name="title"></param>
         /// <param name="year"></param>
         /// <param name="rating"></param>
-        /// <param name="authors"></param>
-        public void CreateNewIsbn(string title, int year, int rating, List<TheAuthor> authors, out ISBN isbn)
+        /// <param name="authorsIds"></param>
+        /// <returns></returns>
+        public int CreateNewIsbn(string title, int year, int rating, List<int> authorsIds, out ISBN newlyCreatedIsbn )
         {
             using (Context context = new Context())
             {
+
+                List<TheAuthor> authors = context.TheAuthors
+                .Where(x => authorsIds.Contains(x.Id))
+                .ToList();
+
                 csSeedGenerator seeder = new csSeedGenerator();
-                isbn = new ISBN()
+                newlyCreatedIsbn = new ISBN()
                 {
                     Title = title,
                     Year = year,
@@ -81,24 +95,36 @@ namespace LibraryDb.Data
                 //Generating a unique random Isbn:
                 ISBN? existingIsbn = null;
                 string randomIsbn;
+                // randomize until we get one that is not in the database:
                 do
                 {
                     randomIsbn = ISBN.RandomizeIsbn(seeder);
                     existingIsbn = context.ISBNs.FirstOrDefault(x => x.Isbn == randomIsbn);
                 }
                 while (existingIsbn != null);
-                isbn.Isbn = randomIsbn;
-                context.ISBNs.Add(isbn);
+                newlyCreatedIsbn.Isbn = randomIsbn;
+                context.ISBNs.Add(newlyCreatedIsbn);
                 context.SaveChanges();
+                int isbnId = newlyCreatedIsbn.Id;
+                return isbnId;
             }
         }
 
-        public void CreateNewIsbn(csSeedGenerator seeder, out ISBN isbn)
+        /// <summary>
+        /// Creates a random instance of an isbn, this does not create copies of the book in the library, it sets the book information (isbn)
+        /// A random unique string is generated as isbn property. The new IsbnId is returned, and its instance as an out.
+        /// </summary>
+        /// <param name="seeder"></param>
+        /// <returns></returns>
+        public int CreateNewIsbn(csSeedGenerator seeder, out ISBN newlyCreatedIsbn)
         {
             using (Context context = new Context())
             {
-                isbn = new ISBN();
-                isbn.Seed(seeder);
+                newlyCreatedIsbn = new ISBN();
+                newlyCreatedIsbn.Seed(seeder);
+                TheAuthor author = new TheAuthor();
+                author.Seed(seeder);
+
                 //Generating a unique random Isbn:
                 ISBN? existingIsbn = null;
                 string randomIsbn;
@@ -108,26 +134,36 @@ namespace LibraryDb.Data
                     existingIsbn = context.ISBNs.FirstOrDefault(x => x.Isbn == randomIsbn);
                 }
                 while (existingIsbn != null);
-                isbn.Isbn = randomIsbn;
-                context.ISBNs.Add(isbn);
+                newlyCreatedIsbn.Isbn = randomIsbn;
+                context.ISBNs.Add(newlyCreatedIsbn);
                 context.SaveChanges();
+                int isbnId = newlyCreatedIsbn.Id;
+                return isbnId;
             }
         }
 
         /// <summary>
-        /// Creates a number of actual instances of the book(isbn) in the library.
+        /// Creates a copy of the book(isbn) in the library. return the bookId (or -1 if isbn dont exist), outputs the book instance.
         /// </summary>
-        public void CreateCopyOfExistingIsbn(int copiesToAdd, ISBN isbn)
+        public int CreateCopyOfExistingIsbn( int isbnId, out Book? newCopy)
         {
             using (Context context = new Context())
             {
-                for (int i = 0; i < copiesToAdd; i++)
+                ISBN? isbn = context.ISBNs.FirstOrDefault(x => x.Id == isbnId);
+                if (isbn != null)
                 {
-                    Book book = new Book();
-                    book.ISBN = isbn;
-                    context.Books.Add(book);
+                    newCopy = new Book();
+                    newCopy.ISBN = isbn;
+                    isbn.Books.Add(newCopy);
+                    context.SaveChanges();
+                    int bookId = newCopy.Id;
+                    return bookId;
                 }
-                context.SaveChanges();
+                else 
+                { 
+                    newCopy = null;
+                    return -1; 
+                }
             }
         }
 
