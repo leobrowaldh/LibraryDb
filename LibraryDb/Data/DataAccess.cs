@@ -118,14 +118,14 @@ namespace LibraryDb.Data
         /// </summary>
         public void CreateCopyOfExistingIsbn(int copiesToAdd, ISBN isbn)
         {
-            for (int i = 0; i < copiesToAdd; i++)
-            {
-                Book book = new Book();
-                book.ISBN = isbn;
-            }
-
             using (Context context = new Context())
             {
+                for (int i = 0; i < copiesToAdd; i++)
+                {
+                    Book book = new Book();
+                    book.ISBN = isbn;
+                    context.Books.Add(book);
+                }
                 context.SaveChanges();
             }
         }
