@@ -11,12 +11,14 @@ namespace LibraryDb.Data
             csSeedGenerator seeder = new csSeedGenerator();
             for (int i = 0; i < numberOfIsbn; i++)
             {
-                int isbnId = CreateNewIsbn(seeder, out ISBN newIsbn);
-                TheAuthor theAuthor = new TheAuthor();
-                theAuthor.Seed(seeder);
-                newIsbn.Authors.Add(theAuthor);
+                int isbnId;
                 using (Context context = new Context())
                 {
+                    isbnId = CreateNewIsbn(seeder, out ISBN newIsbn);
+                    TheAuthor theAuthor = new TheAuthor();
+                    theAuthor.Seed(seeder);
+                    newIsbn.Authors.Add(theAuthor);
+                    context.TheAuthors.Add(theAuthor);
                     context.SaveChanges();
                 }
                 int copies = seeder.Next(minNumberOFCopies, maxNumberOfCopies);

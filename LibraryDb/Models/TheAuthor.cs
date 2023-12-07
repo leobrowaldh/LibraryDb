@@ -10,7 +10,7 @@ namespace LibraryDb.Models
 
         public void Seed(csSeedGenerator seed)
         {
-            AuthorName = seed.FirstName + seed.LastName;
+            AuthorName = seed.FirstName + " " + seed.LastName;
         }
 
         
