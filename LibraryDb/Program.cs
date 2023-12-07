@@ -132,7 +132,7 @@ namespace LibraryDb
         private static int BookBorrowing(DataAccess dataAccess, ConsoleCompanionHelper cc, out int customerId)
         {
             int bookId = cc.AskForInt("Book Id: ");
-            int customerId = cc.AskForInt("Customer Id: ");
+            customerId = cc.AskForInt("Customer Id: ");
             //parsing correct DateTimes:
             bool borrowDateCorrect;
             bool returnDateCorrect;
