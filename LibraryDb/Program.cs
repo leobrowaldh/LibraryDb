@@ -33,24 +33,28 @@ namespace LibraryDb
                 {
                     case 0:
                         {
+                            //Seed the library with some initial Data
                             LibrarySeeding(dataAccess);
                             Feedback("--- Library seeded ---");
                             break;
                         }
                     case 1:
                         {
+                            //Create an author
                             int authorId = AuthorCreate(cc, dataAccess);
                             Feedback($"--- Author Created with Id = {authorId} (remember this id) ---");
                             break;
                         }
                     case 2:
                         {
+                            //Create a book
                             int IsbnId = CreateNewBook(dataAccess, cc);
                             Feedback($"--- New book created with IsbnId = {IsbnId} ---");
                             break;
                         }
                     case 3:
                         {
+                            //Add more copies to an allready existing book
                             List<int> booksIds = BookCopiesCreate(dataAccess, cc);
                             string bookIdString = string.Join(", ", booksIds);
                             Feedback($"--- Book copies created with Id: {bookIdString} ---");
@@ -58,6 +62,7 @@ namespace LibraryDb
                         }
                     case 4:
                         {
+                            //Create a new customer
                             string firstName = cc.AskForString("Customer first name: ");
                             string lastName = cc.AskForString("Customer last name: ");
                             dataAccess.CreateNewCustomer(firstName, lastName);
@@ -67,7 +72,8 @@ namespace LibraryDb
                     case 5:
                         {
                             //borrow a book
-
+                            int bookId = BookBorrowing(dataAccess, cc, out int customerId);
+                            Feedback($"--- Book {bookId} borrowed to {customerId} ---");
                             break;
                         }
                     case 6:
@@ -121,6 +127,34 @@ namespace LibraryDb
                 }
             }
             while (selectedOption != -1);
+        }
+
+        private static int BookBorrowing(DataAccess dataAccess, ConsoleCompanionHelper cc, out int customerId)
+        {
+            int bookId = cc.AskForInt("Book Id: ");
+            int customerId = cc.AskForInt("Customer Id: ");
+            //parsing correct DateTimes:
+            bool borrowDateCorrect;
+            bool returnDateCorrect;
+            DateTime borrowDate;
+            DateTime returnDate = DateTime.Now;
+            do
+            {
+                string borrowDatestring = cc.AskForString("borrow date (yyyy-mm-dd): ");
+                borrowDateCorrect = DateTime.TryParse(borrowDatestring, out borrowDate);
+                if (borrowDateCorrect)
+                {
+                    do
+                    {
+                        string returnDatestring = cc.AskForString("return date (yyyy-mm-dd): ");
+                        returnDateCorrect = DateTime.TryParse(returnDatestring, out returnDate);
+                    }
+                    while (!returnDateCorrect);
+                }
+            }
+            while (!borrowDateCorrect);
+            dataAccess.BorrowBook(bookId, customerId, borrowDate, returnDate);
+            return bookId;
         }
 
         private static List<int> BookCopiesCreate(DataAccess dataAccess, ConsoleCompanionHelper cc)

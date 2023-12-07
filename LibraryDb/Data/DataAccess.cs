@@ -184,16 +184,22 @@ namespace LibraryDb.Data
         #endregion
 
         #region Borrowing and returning
-        public void BorrowBook(Book book, Customer customer, DateTime borrowDate, DateTime returnDate)
+        public void BorrowBook(int bookId, int customerId, DateTime borrowDate, DateTime returnDate)
         {
-            book.Borrowed = true;
-            book.BorrowedDate = borrowDate;
-            book.ReturnDate = returnDate;
-            book.Customer = customer;
-            using(Context context = new Context())
+            using (Context context = new Context())
             {
-                context.SaveChanges();
+                Book? book = context.Books.FirstOrDefault(x => x.Id ==  bookId);
+                Customer? customer = context.Customers.FirstOrDefault(x => x.Id == customerId);
+                if (book != null && customer != null)
+                {
+                    book.Borrowed = true;
+                    book.BorrowedDate = borrowDate;
+                    book.ReturnDate = returnDate;
+                    book.Customer = customer;
+                    context.SaveChanges();
+                }
             }
+            
         }
 
         public void ReturnBook(Book book)
@@ -204,6 +210,15 @@ namespace LibraryDb.Data
             using (Context context = new Context())
             {
                 context.SaveChanges();
+            }
+        }
+
+        public Book GetBookFromDb(int bookId)
+        {
+            using (Context context = new Context())
+            {
+                Book? book = context.Books.FirstOrDefault(x => x.Id == bookId);
+                return book;
             }
         }
 
