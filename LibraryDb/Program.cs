@@ -14,15 +14,17 @@ namespace LibraryDb
 
         private static void RunMenu(DataAccess dataAccess)
         {
-            Console.WriteLine("\n------Welcome to your Local Amazing Library!------\n");
+            
             ConsoleCompanionHelper cc = new();
             int selectedOption = -1;
             var menuSelections = new List<string> {"Seed the library with some initial Data", "Create an author", "Create a book", 
-            "Create a new customer", "Borrow a book", "Return a book", "Delete a customer", "Delete books", "Delete an author"};
-            string menuGuideText = "Menu options, select with enter, ESC to Exit";
+            "Create a new customer", "Borrow a book", "Return a book", "Delete a customer", "Delete books", "Delete an author",
+            "Show customer orderhistory", "Show book orderhistory"};
+            string menuGuideText = "Menu options, select with enter, ESC to Exit\n";
             do
             {
-                selectedOption = cc.CreateMenu(menuSelections, menuGuideText, ConsoleColor.Green, true);
+                Console.Clear();
+                selectedOption = cc.CreateMenu(menuSelections, menuGuideText, ConsoleColor.Green, true, optionsPerColumn:6, columnSpacing:55);
 
                 switch (selectedOption)
                 {
@@ -33,7 +35,7 @@ namespace LibraryDb
                         }
                     case 1:
                         {
-                            
+                            Feedback("Done!");
                             break;
                         }
                     case 2:
@@ -49,6 +51,14 @@ namespace LibraryDb
                 }
             }
             while (selectedOption != -1);
+        }
+
+        private static void Feedback(string message)
+        {
+            Console.Clear();
+            Console.WriteLine(message);
+            Console.WriteLine("press any key to continue...");
+            Console.ReadKey(true);
         }
 
         private static void SeedLibrary(DataAccess dataAccess)
