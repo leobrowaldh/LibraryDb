@@ -3,6 +3,7 @@ using ConsoleCompanion;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Linq;
+using LibraryDb.Models;
 
 namespace LibraryDb
 {
@@ -112,7 +113,7 @@ namespace LibraryDb
                             }
                             
                         }
-                    case 8:
+                    case 8: //TODO: this is only deleting a book instance, change to be able to delete a number of copies, or the whole isbn
                         {
                             //Delete books
                             int bookId = cc.AskForInt("BookId: ", "try again");
@@ -149,7 +150,18 @@ namespace LibraryDb
                     case 10:
                         {
                             //Show customer orderhistory
-
+                            int customerId = cc.AskForInt("CustomerId: ", "Try again");
+                            List<OrderHistory> customerHistory = dataAccess.ShowCustomerOrderHistory(customerId);
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append($"{"Date", -15} {"BookId", -15} {"Name", -15}\n");
+                            foreach (OrderHistory entry in customerHistory)
+                            {
+                                DateTime date = entry.Date;
+                                int bookId = entry.Book.Id;
+                                string name = entry.Book.ISBN.Title;
+                                sb.Append($"{date,-15} {bookId,-15} {name,-15}\n");
+                            }
+                            Feedback(sb.ToString());
                             break;
                         }
                     case 11:

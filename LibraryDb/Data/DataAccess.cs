@@ -302,6 +302,15 @@ namespace LibraryDb.Data
             return false;
         }
 
+        public List<OrderHistory> ShowCustomerOrderHistory(int customerId)
+        {
+            using (Context context = new Context())
+            {
+                List<OrderHistory> customerHistory = context.OrderHistories.Where(x => x.Customer.Id == customerId).ToList();
+                return customerHistory;
+            }
+        }
+
 
 
         #endregion
