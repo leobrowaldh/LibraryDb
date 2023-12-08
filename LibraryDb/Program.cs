@@ -81,7 +81,7 @@ namespace LibraryDb
                             }
                             else
                             {
-                                Feedback($"--- Book {bookId} borrowed to {customerId} ---");
+                                Feedback($"--- Book {bookId} borrowed to customer {customerId} ---");
                                 break;
                             }
                         }
@@ -93,8 +93,13 @@ namespace LibraryDb
                             if (!sucess)
                             {
                                 FeedbackRed("Book not found");
+                                break;
                             }
-                            break;
+                            else
+                            {
+                                Feedback($"Book {bookId} returned");
+                                break;
+                            }
                         }
                     case 7:
                         {

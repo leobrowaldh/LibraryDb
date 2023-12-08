@@ -13,13 +13,13 @@ namespace LibraryDb.Data
             {
                 int isbnId;
                 using (Context context = new Context())
-                {
-                    isbnId = CreateNewIsbn(seeder, out ISBN newIsbn);
+                {   CreateNewIsbn(seeder, out ISBN newIsbn, context);
                     TheAuthor theAuthor = new TheAuthor();
                     theAuthor.Seed(seeder);
                     newIsbn.Authors.Add(theAuthor);
                     context.TheAuthors.Add(theAuthor);
                     context.SaveChanges();
+                    isbnId = newIsbn.Id;
                 }
                 int copies = seeder.Next(minNumberOFCopies, maxNumberOfCopies);
                 for (int j = 0; j < copies; j++)
@@ -143,6 +143,34 @@ namespace LibraryDb.Data
                 int isbnId = newlyCreatedIsbn.Id;
                 return isbnId;
             }
+        }
+
+        /// <summary>
+        /// if a context is passed, that context will be used, and context.SaveChanges is not executed.
+        /// </summary>
+        /// <param name="seeder"></param>
+        /// <param name="newlyCreatedIsbn"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public void CreateNewIsbn(csSeedGenerator seeder, out ISBN newlyCreatedIsbn, Context context)
+        {
+                newlyCreatedIsbn = new ISBN();
+                newlyCreatedIsbn.Seed(seeder);
+                TheAuthor author = new TheAuthor();
+                author.Seed(seeder);
+
+                //Generating a unique random Isbn:
+                ISBN? existingIsbn = null;
+                string randomIsbn;
+                do
+                {
+                    randomIsbn = ISBN.RandomizeIsbn(seeder);
+                    existingIsbn = context.ISBNs.FirstOrDefault(x => x.Isbn == randomIsbn);
+                }
+                while (existingIsbn != null);
+                newlyCreatedIsbn.Isbn = randomIsbn;
+                context.ISBNs.Add(newlyCreatedIsbn);
+                int isbnId = newlyCreatedIsbn.Id;
         }
 
         /// <summary>
