@@ -199,7 +199,8 @@ namespace LibraryDb.Data
                     OrderHistory newOrder = new OrderHistory();
                     newOrder.Date = borrowDate;
                     newOrder.Customer = customer;
-                    book.OrderHistory.Add(newOrder);
+                    newOrder.Book = book;
+                    context.OrderHistories.Add(newOrder);
                     context.SaveChanges();
                     return true;
                 }
@@ -311,7 +312,7 @@ namespace LibraryDb.Data
             }
         }
 
-
+        
 
         #endregion
 
