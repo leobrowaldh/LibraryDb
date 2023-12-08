@@ -22,12 +22,12 @@ namespace LibraryDb
             var menuSelections = new List<string> {"Seed the library with some initial Data", "Create an author", "Create a book", 
             "Add more copies to an allready existing book", "Create a new customer", "Borrow a book", "Return a book", "Delete a customer", 
                 "Delete books", "Delete an author", "Show customer orderhistory", "Show book orderhistory", "Show all books in library", 
-                "Show all customers"};
+                "Show all customers", "Show all copies of a book"};
             string menuGuideText = "Menu options, select with enter, ESC to Exit\n";
             do
             {
                 Console.Clear();
-                selectedOption = cc.CreateMenu(menuSelections, menuGuideText, ConsoleColor.Green, true, optionsPerColumn:7, columnSpacing:55);
+                selectedOption = cc.CreateMenu(menuSelections, menuGuideText, ConsoleColor.Green, true, optionsPerColumn:8, columnSpacing:55);
 
                 switch (selectedOption)
                 {
@@ -73,31 +73,77 @@ namespace LibraryDb
                         {
                             //borrow a book
                             int bookId = BookBorrowing(dataAccess, cc, out int customerId);
-                            Feedback($"--- Book {bookId} borrowed to {customerId} ---");
-                            break;
+                            if(bookId == -1)
+                            {
+                                FeedbackRed("book or customer not found in database, try again.");
+                                break;
+                            }
+                            else
+                            {
+                                Feedback($"--- Book {bookId} borrowed to {customerId} ---");
+                                break;
+                            }
                         }
                     case 6:
                         {
                             //Return a book
-
+                            int bookId = cc.AskForInt("BookId: ", "Try again");
+                            bool sucess = dataAccess.ReturnBook(bookId);
+                            if (!sucess)
+                            {
+                                FeedbackRed("Book not found");
+                            }
                             break;
                         }
                     case 7:
                         {
                             //Delete a customer
-
-                            break;
+                            int customerId = cc.AskForInt("CustomerId: ", "Try again");
+                            bool success = dataAccess.DeleteCustomer(customerId);
+                            if (success)
+                            {
+                                Feedback("Customer Deleter");
+                                break;
+                            }
+                            else
+                            {
+                                FeedbackRed("Customer not found");
+                                break;
+                            }
+                            
                         }
                     case 8:
                         {
                             //Delete books
-
-                            break;
+                            int bookId = cc.AskForInt("BookId: ", "try again");
+                            bool success = dataAccess.DeleteBook(bookId);
+                            if (success)
+                            {
+                                Feedback($"Book {bookId} removed from database");
+                                break;
+                            }
+                            else
+                            {
+                                FeedbackRed("Book not found");
+                                break;
+                            }
+                            
                         }
-                    case 9:
+                    case 9: //TODO: CHECK WHAT HAPPENS TO THE CORRESPONDING ISBN WHEN AUTHOR REMOVED...CASCADE DELETE?
                         {
                             //Delete an author
-
+                            int authorId = cc.AskForInt("AuthorId: ", "try again");
+                            bool success = dataAccess.DeleteAuthor(authorId);
+                            if (success)
+                            {
+                                Feedback($"Author {authorId} removed from database");
+                                break;
+                            }
+                            else
+                            {
+                                FeedbackRed("Author not found");
+                                break;
+                            }
                             break;
                         }
                     case 10:
@@ -114,7 +160,7 @@ namespace LibraryDb
                         }
                     case 12:
                         {
-                            //Show all books in librar
+                            //Show all books in library
 
                             break;
                         }
@@ -122,6 +168,12 @@ namespace LibraryDb
                         {
                             //Show all customers
 
+                            break;
+                        }
+                    case 14:
+                        {
+                            //Show all copies of a book
+                            //bookid, leant or not, customer leant to...
                             break;
                         }
                 }
@@ -143,18 +195,21 @@ namespace LibraryDb
                 string borrowDatestring = cc.AskForString("borrow date (yyyy-mm-dd): ");
                 borrowDateCorrect = DateTime.TryParse(borrowDatestring, out borrowDate);
                 if (borrowDateCorrect)
-                {
-                    do
-                    {
-                        string returnDatestring = cc.AskForString("return date (yyyy-mm-dd): ");
-                        returnDateCorrect = DateTime.TryParse(returnDatestring, out returnDate);
-                    }
-                    while (!returnDateCorrect);
+                {   //the book should be returned in 30 days.
+                    returnDate = borrowDate.AddDays(30);
                 }
             }
             while (!borrowDateCorrect);
-            dataAccess.BorrowBook(bookId, customerId, borrowDate, returnDate);
-            return bookId;
+            bool success = dataAccess.BorrowBook(bookId, customerId, borrowDate, returnDate);
+            if (success)
+            {
+                return bookId;
+            }
+            else
+            {
+                return -1;
+            }
+            
         }
 
         private static List<int> BookCopiesCreate(DataAccess dataAccess, ConsoleCompanionHelper cc)
@@ -208,7 +263,19 @@ namespace LibraryDb
         private static void Feedback(string message)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(message);
+            Console.ResetColor();
+            Console.WriteLine("press any key to continue...");
+            Console.ReadKey(true);
+        }
+
+        private static void FeedbackRed(string message)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
             Console.WriteLine("press any key to continue...");
             Console.ReadKey(true);
         }

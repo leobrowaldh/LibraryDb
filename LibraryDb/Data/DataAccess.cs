@@ -184,7 +184,7 @@ namespace LibraryDb.Data
         #endregion
 
         #region Borrowing and returning
-        public void BorrowBook(int bookId, int customerId, DateTime borrowDate, DateTime returnDate)
+        public bool BorrowBook(int bookId, int customerId, DateTime borrowDate, DateTime returnDate)
         {
             using (Context context = new Context())
             {
@@ -196,21 +196,40 @@ namespace LibraryDb.Data
                     book.BorrowedDate = borrowDate;
                     book.ReturnDate = returnDate;
                     book.Customer = customer;
+                    OrderHistory newOrder = new OrderHistory();
+                    newOrder.Date = borrowDate;
+                    newOrder.Customer = customer;
+                    book.OrderHistory.Add(newOrder);
                     context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public bool ReturnBook(int bookId)
+        {
+            using (Context context = new Context())
+            {
+                Book? book = context.Books.FirstOrDefault(x => x.Id == bookId);
+                if (book != null)
+                {
+                    book.Borrowed = false;
+                    book.BorrowedDate = null;
+                    book.ReturnDate = null;
+                    book.Customer = null;
+                    context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             
-        }
-
-        public void ReturnBook(Book book)
-        {
-            book.Borrowed = false;
-            book.BorrowedDate= null;
-            book.ReturnDate= null;
-            using (Context context = new Context())
-            {
-                context.SaveChanges();
-            }
         }
 
         public Book GetBookFromDb(int bookId)
@@ -261,6 +280,21 @@ namespace LibraryDb.Data
                 if (bookToBeDeleted != null)
                 {
                     context.Books.Remove(bookToBeDeleted);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool DeleteAuthor(int authorId)
+        {
+            using (Context context = new Context())
+            {
+                TheAuthor? authorToBeDeleted = context.TheAuthors.Find(authorId);
+                if (authorToBeDeleted != null)
+                {
+                    context.TheAuthors.Remove(authorToBeDeleted);
                     context.SaveChanges();
                     return true;
                 }
