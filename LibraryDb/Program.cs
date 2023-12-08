@@ -158,13 +158,17 @@ namespace LibraryDb
                             int customerId = cc.AskForInt("CustomerId: ", "Try again");
                             List<OrderHistory> customerHistory = dataAccess.ShowCustomerOrderHistory(customerId);
                             StringBuilder sb = new StringBuilder();
-                            sb.Append($"{"Date", -15} {"BookId", -15} {"Name", -15}\n");
+                            sb.Append($"{"Date", -15} {"BookId", -15} {"Title", -15}\n");
                             foreach (OrderHistory entry in customerHistory)
                             {
                                 DateTime date = entry.Date;
-                                int bookId = entry.Book.Id;
-                                string name = entry.Book.ISBN.Title;
-                                sb.Append($"{date,-15} {bookId,-15} {name,-15}\n");
+                                int bookId = entry.BookId;
+                                bool success = dataAccess.GetBookTitle(bookId, out string title);
+                                if (!success)
+                                {
+                                    continue;
+                                }
+                                sb.Append($"{date,-15} {bookId,-15} {title,-15}\n");
                             }
                             Feedback(sb.ToString());
                             break;

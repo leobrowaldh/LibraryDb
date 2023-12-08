@@ -1,5 +1,6 @@
 ﻿using Helpers;
 using LibraryDb.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryDb.Data
 {
@@ -337,6 +338,29 @@ namespace LibraryDb.Data
             {
                 List<OrderHistory> customerHistory = context.OrderHistories.Where(x => x.Customer.Id == customerId).ToList();
                 return customerHistory;
+            }
+        }
+
+        public bool GetBookTitle(int bookId, out string bookTitle)
+        {
+            using (Context context = new Context())
+            {
+                Book? book = GetBookFromDb(bookId);
+                ISBN? isbn = context.Books
+                    .Include(b => b.ISBN)
+                    .Where(b => b.Id == bookId)
+                    .Select(b => b.ISBN)
+                    .FirstOrDefault();
+                if (book != null && isbn != null)
+                {
+                    bookTitle = isbn.Title;
+                    return true;
+                }
+                else
+                {
+                    bookTitle = "unknown";
+                    return false;
+                }
             }
         }
 
