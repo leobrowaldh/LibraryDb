@@ -1,6 +1,7 @@
 ﻿using Helpers;
 using LibraryDb.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace LibraryDb.Data
 {
@@ -262,15 +263,6 @@ namespace LibraryDb.Data
             
         }
 
-        public Book GetBookFromDb(int bookId)
-        {
-            using (Context context = new Context())
-            {
-                Book? book = context.Books.FirstOrDefault(x => x.Id == bookId);
-                return book;
-            }
-        }
-
         #endregion
 
         #region Removing things from database
@@ -336,8 +328,17 @@ namespace LibraryDb.Data
         {
             using (Context context = new Context())
             {
-                List<OrderHistory> customerHistory = context.OrderHistories.Where(x => x.Customer.Id == customerId).ToList();
+                List<OrderHistory> customerHistory = context.OrderHistories.Where(x => x.CustomerId == customerId).ToList();
                 return customerHistory;
+            }
+        }
+
+        public List<OrderHistory> ShowBookOrderHistory(int bookId)
+        {
+            using (Context context = new Context())
+            {
+                List<OrderHistory> bookHistory = context.OrderHistories.Where(x => x.BookId == bookId).ToList();
+                return bookHistory;
             }
         }
 
@@ -345,7 +346,7 @@ namespace LibraryDb.Data
         {
             using (Context context = new Context())
             {
-                Book? book = GetBookFromDb(bookId);
+                Book? book = context.Books.FirstOrDefault(x => x.Id == bookId);
                 ISBN? isbn = context.Books
                     .Include(b => b.ISBN)
                     .Where(b => b.Id == bookId)
@@ -361,6 +362,39 @@ namespace LibraryDb.Data
                     bookTitle = "unknown";
                     return false;
                 }
+            }
+        }
+
+        public bool GetCustomerName(int customerId, out string customerName)
+        {
+            using (Context context = new Context())
+            {
+                Customer? customer = context.Customers.FirstOrDefault(x => x.Id == customerId);
+                if (customer != null)
+                {
+                    customerName = customer.FirstName + " " + customer.LastName;
+                    return true;
+                }
+                else
+                {
+                    customerName = "unknown";
+                    return false;
+                }
+            }
+        }
+
+        public List<string> GetAllBooksAsString()
+        {
+            using (Context context = new Context())
+            {
+                List<string> allBooks = new List<string>();
+                allBooks.Add($"{"isbn",-15} {"Book name",-35} {"Number of copies",-15}");
+                foreach (var isbn in context.ISBNs.Include(x => x.Books))
+                {
+                    int bookCount = isbn.Books?.Count() ?? 0;
+                    allBooks.Add($"{isbn.Id, -15} {isbn.Title, -35} {bookCount, -15}");
+                }
+                return allBooks;
             }
         }
 

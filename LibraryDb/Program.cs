@@ -42,6 +42,7 @@ namespace LibraryDb
                     case 1:
                         {
                             //Create an author
+                            Console.Clear();
                             int authorId = AuthorCreate(cc, dataAccess);
                             Feedback($"--- Author Created with Id = {authorId} (remember this id) ---");
                             break;
@@ -49,6 +50,7 @@ namespace LibraryDb
                     case 2:
                         {
                             //Create a book
+                            Console.Clear();
                             int IsbnId = CreateNewBook(dataAccess, cc);
                             Feedback($"--- New book created with IsbnId = {IsbnId} ---");
                             break;
@@ -56,6 +58,7 @@ namespace LibraryDb
                     case 3:
                         {
                             //Add more copies to an allready existing book
+                            Console.Clear();
                             List<int> booksIds = BookCopiesCreate(dataAccess, cc);
                             string bookIdString = string.Join(", ", booksIds);
                             Feedback($"--- Book copies created with Id: {bookIdString} ---");
@@ -64,6 +67,7 @@ namespace LibraryDb
                     case 4:
                         {
                             //Create a new customer
+                            Console.Clear();
                             string firstName = cc.AskForString("Customer first name: ");
                             string lastName = cc.AskForString("Customer last name: ");
                             dataAccess.CreateNewCustomer(firstName, lastName);
@@ -73,6 +77,7 @@ namespace LibraryDb
                     case 5:
                         {
                             //borrow a book
+                            Console.Clear();
                             int bookId = BookBorrowing(dataAccess, cc, out int customerId);
                             if(bookId == -1)
                             {
@@ -88,6 +93,7 @@ namespace LibraryDb
                     case 6:
                         {
                             //Return a book
+                            Console.Clear();
                             int bookId = cc.AskForInt("BookId: ", "Try again");
                             bool sucess = dataAccess.ReturnBook(bookId);
                             if (!sucess)
@@ -104,6 +110,7 @@ namespace LibraryDb
                     case 7:
                         {
                             //Delete a customer
+                            Console.Clear();
                             int customerId = cc.AskForInt("CustomerId: ", "Try again");
                             bool success = dataAccess.DeleteCustomer(customerId);
                             if (success)
@@ -138,6 +145,7 @@ namespace LibraryDb
                     case 9: //TODO: CHECK WHAT HAPPENS TO THE CORRESPONDING ISBN WHEN AUTHOR REMOVED...CASCADE DELETE?
                         {
                             //Delete an author
+                            Console.Clear();
                             int authorId = cc.AskForInt("AuthorId: ", "try again");
                             bool success = dataAccess.DeleteAuthor(authorId);
                             if (success)
@@ -150,15 +158,15 @@ namespace LibraryDb
                                 FeedbackRed("Author not found");
                                 break;
                             }
-                            break;
                         }
                     case 10:
                         {
                             //Show customer orderhistory
+                            Console.Clear();
                             int customerId = cc.AskForInt("CustomerId: ", "Try again");
                             List<OrderHistory> customerHistory = dataAccess.ShowCustomerOrderHistory(customerId);
                             StringBuilder sb = new StringBuilder();
-                            sb.Append($"{"Date", -15} {"BookId", -15} {"Title", -15}\n");
+                            sb.Append($"{"Date", -25} {"BookId", -15} {"Title", -15}\n");
                             foreach (OrderHistory entry in customerHistory)
                             {
                                 DateTime date = entry.Date;
@@ -168,7 +176,7 @@ namespace LibraryDb
                                 {
                                     continue;
                                 }
-                                sb.Append($"{date,-15} {bookId,-15} {title,-15}\n");
+                                sb.Append($"{date, -25} {bookId,-15} {title,-15}\n");
                             }
                             Feedback(sb.ToString());
                             break;
@@ -176,18 +184,42 @@ namespace LibraryDb
                     case 11:
                         {
                             //Show book orderhistory
-
+                            Console.Clear();
+                            int bookId = cc.AskForInt("BookId: ", "Try again");
+                            List<OrderHistory> bookHistory = dataAccess.ShowBookOrderHistory(bookId);
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append($"{"Date",-25} {"CustomerId",-15} {"Customer Name",-15}\n");
+                            foreach (OrderHistory entry in bookHistory)
+                            {
+                                DateTime date = entry.Date;
+                                int customerId = entry.CustomerId;
+                                bool success = dataAccess.GetCustomerName(customerId, out string customerName);
+                                if (!success)
+                                {
+                                    continue;
+                                }
+                                sb.Append($"{date, -25} {customerId,-15} {customerName,-15}\n");
+                            }
+                            Feedback(sb.ToString());
                             break;
                         }
                     case 12:
                         {
                             //Show all books in library
-
+                            Console.Clear();
+                            List<string> allBooks = dataAccess.GetAllBooksAsString();
+                            StringBuilder sb = new StringBuilder();
+                            foreach (string row in allBooks)
+                            {
+                                sb.Append(row + "\n");
+                            }
+                            Feedback(sb.ToString());
                             break;
                         }
                     case 13:
                         {
                             //Show all customers
+                            Console.Clear();
 
                             break;
                         }
@@ -195,6 +227,7 @@ namespace LibraryDb
                         {
                             //Show all copies of a book
                             //bookid, leant or not, customer leant to...
+                            Console.Clear();
                             break;
                         }
                 }
