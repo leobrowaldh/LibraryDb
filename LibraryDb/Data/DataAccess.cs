@@ -398,7 +398,52 @@ namespace LibraryDb.Data
             }
         }
 
-        
+        public List<string> GetAllCustomersAsString()
+        {
+            using (Context context = new Context())
+            {
+                List<string> allCustomers = new List<string>();
+                allCustomers.Add($"{"Id",-15} {"First name",-15} {"Last name", -15}");
+                foreach (var customer in context.Customers)
+                {
+
+                    allCustomers.Add($"{customer.Id,-15} {customer.FirstName,-15} {customer.LastName, -15}");
+                }
+                return allCustomers;
+            }
+        }
+
+        public List<string> GetAllCopiesOfIsbnAsString(int isbnId)
+        {
+            using (Context context = new Context())
+            {
+                List<string> books = new List<string>();
+                books.Add($"{"BookId",-15} {"Borrowed to",-25} {"CustomerId", -15}");
+                foreach (var book in context.Books
+                    .Include(i => i.Customer)
+                    .Include(s => s.ISBN)
+                    .Where(b => b.ISBN.Id == isbnId))
+                {
+                    books.Add($"{book.Id,-15} {book.Customer?.FirstName + book.Customer?.LastName,-25} {book.Customer?.Id,-15}");
+                }
+                return books;
+            }
+        }
+
+        public bool DeleteIsbn(int isbnId)
+        {
+            using (var context = new Context())
+            {
+                var isbnToRemove = context.ISBNs.Find(isbnId);
+                if (isbnToRemove != null)
+                {
+                    context.Remove(isbnToRemove);
+                    context.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
 
         #endregion
 
