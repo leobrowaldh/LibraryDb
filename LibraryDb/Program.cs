@@ -91,7 +91,7 @@ namespace LibraryDb
                             }
                         }
                     case 6:
-                        {
+                        { //TODO: THE BOOK IS STILL SHOWING AS BORROWED...
                             //Return a book
                             Console.Clear();
                             int bookId = cc.AskForInt("BookId: ", "Try again");
@@ -125,7 +125,7 @@ namespace LibraryDb
                             }
                             
                         }
-                    case 8: //TODO: this is only deleting a book instance, change to be able to delete a number of copies, or the whole isbn
+                    case 8: 
                         {
                             //Delete a book copy
                             int bookId = cc.AskForInt("BookId: ", "try again");
@@ -242,7 +242,6 @@ namespace LibraryDb
                     case 14:
                         {
                             //Show all copies of a book
-                            //bookid, leant or not, customer leant to...
                             Console.Clear();
                             int isbn = cc.AskForInt("IsbnId: ", "Try again");
                             List<string> books = dataAccess.GetAllCopiesOfIsbnAsString(isbn);
@@ -354,7 +353,7 @@ namespace LibraryDb
 
         private static int AuthorCreate(ConsoleCompanionHelper cc, DataAccess dataAccess)
         {
-            string authorName = cc.AskForString("Enter the name of the new author ");
+            string authorName = cc.AskForString("Enter the name of the new author: ");
             int authorId = dataAccess.CreateAuthor(authorName, out _);
             return authorId;
         }

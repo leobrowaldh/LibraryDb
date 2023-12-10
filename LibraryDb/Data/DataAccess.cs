@@ -245,7 +245,7 @@ namespace LibraryDb.Data
         {
             using (Context context = new Context())
             {
-                Book? book = context.Books.FirstOrDefault(x => x.Id == bookId);
+                Book? book = context.Books.Include(b => b.Customer).FirstOrDefault(x => x.Id == bookId);
                 if (book != null)
                 {
                     book.Borrowed = false;
@@ -323,6 +323,25 @@ namespace LibraryDb.Data
             }
             return false;
         }
+
+        public bool DeleteIsbn(int isbnId)
+        {
+            using (var context = new Context())
+            {
+                var isbnToRemove = context.ISBNs.Find(isbnId);
+                if (isbnToRemove != null)
+                {
+                    context.Remove(isbnToRemove);
+                    context.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Looking at things in database
 
         public List<OrderHistory> ShowCustomerOrderHistory(int customerId)
         {
@@ -424,26 +443,13 @@ namespace LibraryDb.Data
                     .Include(s => s.ISBN)
                     .Where(b => b.ISBN.Id == isbnId))
                 {
-                    books.Add($"{book.Id,-15} {book.Customer?.FirstName + book.Customer?.LastName,-25} {book.Customer?.Id,-15}");
+                    books.Add($"{book.Id,-15} {book.Customer?.FirstName + " " + book.Customer?.LastName,-25} {book.Customer?.Id,-15}");
                 }
                 return books;
             }
         }
 
-        public bool DeleteIsbn(int isbnId)
-        {
-            using (var context = new Context())
-            {
-                var isbnToRemove = context.ISBNs.Find(isbnId);
-                if (isbnToRemove != null)
-                {
-                    context.Remove(isbnToRemove);
-                    context.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-        }
+        
 
         #endregion
 
